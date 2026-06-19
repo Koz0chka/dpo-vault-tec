@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vault-Tec Terminal — Регистрация</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body class="auth-body">
+  <main class="auth-card">
+    <div class="auth-logo">
+      <svg viewBox="0 0 48 48" width="64" height="64" aria-hidden="true">
+        <circle cx="24" cy="24" r="22" fill="none" stroke="#00ff41" stroke-width="2"/>
+        <circle cx="24" cy="24" r="16" fill="none" stroke="#00ff41" stroke-width="1" stroke-dasharray="2 2"/>
+        <rect x="15" y="22" width="18" height="14" rx="1" fill="#00ff41"/>
+        <path d="M18 22 V16 a6 6 0 0 1 12 0 V22" fill="none" stroke="#00ff41" stroke-width="2.5"/>
+        <circle cx="24" cy="28" r="2" fill="#0a0e0a"/>
+        <rect x="23" y="28" width="2" height="5" fill="#0a0e0a"/>
+      </svg>
+      <h1>VAULT-TEC</h1>
+      <p class="auth-subtitle">Dweller Registration</p>
+      <p class="auth-version">FORM 2241-B // DWELLER INTAKE</p>
+    </div>
+
+    <form id="registerForm" class="auth-form" novalidate>
+      <label class="field">
+        <span class="field-label">&gt; USER ID</span>
+        <input type="text" name="username" autocomplete="username" required
+               minlength="3" maxlength="32" pattern="[A-Za-z0-9_\-]{3,32}"
+               placeholder="vault-dweller" />
+        <small class="field-hint">3–32 символа: A–Z, a–z, 0–9, _ , -</small>
+      </label>
+
+      <label class="field">
+        <span class="field-label">&gt; MASTER KEY</span>
+        <div class="input-with-action">
+          <input type="password" id="master_password" name="master_password" autocomplete="new-password" required minlength="8" placeholder="********" />
+          <button type="button" class="ghost-btn toggle-pwd" data-target="master_password" aria-label="Показать пароль">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+        </div>
+        <div class="strength-meter" aria-hidden="true">
+          <div id="strengthBar" class="strength-bar"></div>
+        </div>
+        <small id="strengthLabel" class="field-hint">Минимум 8 символов</small>
+      </label>
+
+      <label class="field">
+        <span class="field-label">&gt; CONFIRM MASTER KEY</span>
+        <input type="password" name="confirm_password" autocomplete="new-password" required minlength="8" placeholder="********" />
+      </label>
+
+      <div id="errorBox" class="error-box" role="alert" hidden></div>
+
+      <button type="submit" class="primary-btn">&gt; SUBMIT APPLICATION</button>
+      <a href="/" class="link-btn">&gt; ALREADY A DWELLER? SIGN IN</a>
+    </form>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/register.js"></script>
+</body>
+</html>

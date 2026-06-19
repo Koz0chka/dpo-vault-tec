@@ -1,0 +1,25 @@
+:8080 {
+    # Блок 1: всё под /api/* — на бэкенд.
+    handle /api/* {
+        reverse_proxy 127.0.0.1:8000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+        }
+    }
+
+    # Блок 2: всё остальное — статика фронтенда.
+    handle {
+        root * ./frontend
+        file_server
+        try_files {path} /index.html
+    }
+
+    @static path /css/* /js/* /favicon.svg
+    header @static Cache-Control "no-cache"
+
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}

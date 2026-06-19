@@ -1,0 +1,55 @@
+# Caddyfile для Password Vault
+#
+# Caddy:
+#   1. Автоматически получает TLS-сертификат для test.kozochka.org
+#      через Let's Encrypt.
+#   2. Раздаёт статику фронтенда из /srv (примонтирован ./frontend).
+#   3. Реверс-проксирует /api/* на backend:8000.
+#   4. Включает разумные заголовки безопасности.
+
+test.kozochka.org {
+    encode zstd gzip
+
+    # Заголовки безопасности.
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        # CSP: только свои скрипты/стили, шрифты — с Google Fonts.
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        # Удаляем заголовок, выдающий Caddy.
+        -Server
+    }
+
+    # API — на бэкенд.
+    reverse_proxy /api/* backend:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Корень и статика.
+    root * /srv
+    encode
+    file_server {
+        precompressed br gzip
+    }
+
+    # Точечные роуты SPA-подобного фронтенда: index.html — по корню,
+    # register.html и dashboard.html — отдельными файлами.
+    # Если запросят несуществующий путь, отдаём index.html (логин).
+    try_files {path} /index.html
+
+    # Кэшируем статику.
+    @static path /css/* /js/* /favicon.svg
+    header @static Cache-Control "public, max-age=3600"
+
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}

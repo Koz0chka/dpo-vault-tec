@@ -1,0 +1,711 @@
+/* ===================================================================
+   Vault-Tec Password Vault — стили в эстетике Fallout / Pip-Boy
+   -------------------------------------------------------------------
+   • «монохромный зелёный фосфор» — Pip-Boy интерфейс
+   • моноширинный шрифт для всего текста (терминал RobCo)
+   • скан-линии поверх экрана — CRT-эффект
+   • amber-акцент для предупреждений, красный — для ошибок
+   • без фреймворков — чистый CSS
+   =================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+:root {
+  /* Базовая палитра */
+  --bg: #0a0e0a;                  /* почти чёрный с зелёным отливом */
+  --bg-elev: #0f1a0f;             /* карточки */
+  --bg-elev-2: #142214;           /* поля ввода */
+  --bg-deep: #050805;             /* самый тёмный */
+
+  /* Pip-Boy зелёный */
+  --term: #00ff41;                /* основной фосфорно-зелёный */
+  --term-bright: #6bff8a;         /* яркий (заголовки) */
+  --term-dim: #2a8c3a;            /* тусклый (метаданные) */
+  --term-faint: #145c1f;          /* очень тусклый (рамки) */
+
+  /* Акценты */
+  --amber: #ffb000;               /* предупреждения */
+  --amber-dim: #8a6000;
+  --danger: #ff3030;              /* ошибки / удаление */
+  --danger-dim: #8c1818;
+  --cyan: #00d4ff;                /* инфо */
+
+  --border: #1f3a23;
+  --border-strong: #2f5d35;
+
+  --shadow: 0 0 24px rgba(0, 255, 65, 0.12), inset 0 0 12px rgba(0, 0, 0, 0.6);
+  --glow: 0 0 8px rgba(0, 255, 65, 0.45);
+
+  --radius: 2px;
+  --radius-sm: 1px;
+
+  --font: 'Share Tech Mono', 'JetBrains Mono', 'Courier New', monospace;
+  --font-display: 'VT323', 'Share Tech Mono', monospace;
+  --font-size: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--term);
+  font-size: var(--font-size);
+  line-height: 1.5;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+  letter-spacing: 0.02em;
+  min-height: 100vh;
+}
+
+/* CRT-скан-линии — поверх всего экрана */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Лёгкое мерцание CRT */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+a {
+  color: var(--term-bright);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+a:hover { color: var(--amber); text-shadow: 0 0 6px var(--amber); }
+
+::selection { background: var(--term); color: var(--bg-deep); }
+
+/* Скроллбар в стиле Pip-Boy */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--term-faint); border: 1px solid var(--border-strong); }
+::-webkit-scrollbar-thumb:hover { background: var(--term-dim); }
+
+/* ===================== Страницы аутентификации ===================== */
+
+.auth-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(900px 600px at 80% -10%, rgba(0, 255, 65, 0.10), transparent 60%),
+    radial-gradient(700px 500px at -10% 110%, rgba(255, 176, 0, 0.06), transparent 60%),
+    var(--bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  padding: 32px 32px 28px;
+  position: relative;
+}
+
+/* Угловые засечки на карточке — терминальный орнамент */
+.auth-card::before,
+.auth-card::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--term);
+}
+.auth-card::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.auth-card::after  { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--term-faint);
+}
+.auth-logo svg { filter: drop-shadow(0 0 6px var(--term)); }
+.auth-logo h1 {
+  margin: 12px 0 4px;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--term-bright);
+  text-shadow: var(--glow);
+}
+.auth-subtitle {
+  margin: 0;
+  color: var(--term-dim);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+.auth-version {
+  margin-top: 6px;
+  color: var(--term-faint);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+/* ===================== Поля и кнопки ===================== */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--term-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+.field-hint {
+  font-size: 10px;
+  color: var(--term-faint);
+  letter-spacing: 0.1em;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="search"],
+input[type="range"],
+textarea, select {
+  width: 100%;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-strong);
+  color: var(--term-bright);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  transition: border-color 0.1s, box-shadow 0.1s;
+  caret-color: var(--term-bright);
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--term);
+  box-shadow: 0 0 0 1px var(--term), inset 0 0 8px rgba(0, 255, 65, 0.12);
+}
+input[readonly] {
+  color: var(--term);
+  background: var(--bg-elev-2);
+  text-shadow: 0 0 4px var(--term);
+}
+input::placeholder { color: var(--term-faint); }
+
+.input-with-action {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.input-with-action input { flex: 1; }
+
+.primary-btn, .secondary-btn, .ghost-btn, .link-btn {
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.1s;
+  position: relative;
+}
+
+.primary-btn {
+  background: var(--term-faint);
+  color: var(--term-bright);
+  border: 1px solid var(--term);
+  padding: 10px 16px;
+  font-weight: 400;
+  text-shadow: 0 0 4px var(--term);
+}
+.primary-btn:hover {
+  background: var(--term-dim);
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.45), inset 0 0 8px rgba(0, 255, 65, 0.2);
+  text-shadow: 0 0 6px var(--term-bright);
+}
+.primary-btn:active { transform: translateY(1px); }
+.primary-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.secondary-btn {
+  background: transparent;
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  padding: 8px 14px;
+}
+.secondary-btn:hover {
+  background: rgba(255, 176, 0, 0.08);
+  box-shadow: 0 0 8px rgba(255, 176, 0, 0.3);
+}
+
+.ghost-btn {
+  background: transparent;
+  color: var(--term-dim);
+  border: 1px solid var(--border-strong);
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+.ghost-btn:hover {
+  color: var(--term-bright);
+  border-color: var(--term);
+  text-shadow: 0 0 4px var(--term);
+}
+
+.link-btn {
+  background: transparent;
+  border: none;
+  color: var(--term-bright);
+  text-align: center;
+  padding: 6px;
+  margin-top: 4px;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 12px;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+.link-btn:hover { color: var(--amber); text-shadow: 0 0 6px var(--amber); }
+
+/* ===================== Индикатор силы пароля ===================== */
+
+.strength-meter {
+  height: 6px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.strength-bar {
+  height: 100%;
+  width: 0;
+  background: var(--danger);
+  transition: width 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.strength-bar.weak         { width: 25%;  background: var(--danger);   box-shadow: 0 0 6px var(--danger); }
+.strength-bar.medium       { width: 55%;  background: var(--amber);    box-shadow: 0 0 6px var(--amber); }
+.strength-bar.strong       { width: 80%;  background: var(--term);     box-shadow: 0 0 6px var(--term); }
+.strength-bar.very-strong  { width: 100%; background: var(--term-bright); box-shadow: 0 0 8px var(--term-bright); }
+
+/* ===================== Блоки ошибок ===================== */
+
+.error-box {
+  background: rgba(255, 48, 48, 0.08);
+  border: 1px solid var(--danger);
+  color: #ff8080;
+  padding: 8px 12px;
+  font-size: 12px;
+  text-shadow: 0 0 4px var(--danger);
+  position: relative;
+}
+.error-box::before {
+  content: '> ERROR: ';
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* ===================== App layout (dashboard) ===================== */
+
+.app-body { min-height: 100vh; }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border-strong);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.app-header__left, .app-header__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.app-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--term-bright);
+  letter-spacing: 0.08em;
+  text-shadow: var(--glow);
+}
+.app-header__left svg { filter: drop-shadow(0 0 4px var(--term)); }
+
+.user-badge {
+  color: var(--term-dim);
+  font-size: 11px;
+  padding: 4px 10px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.user-badge::before { content: 'USER://'; color: var(--term-faint); }
+
+.app-main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ===================== Панели ===================== */
+
+.panel {
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  padding: 18px 20px;
+  position: relative;
+}
+.panel::before {
+  content: attr(data-corner);
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  background: var(--term);
+  color: var(--bg-deep);
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 0 14px;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--term-faint);
+}
+.panel__head h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--term-bright);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel__head h2::before { content: '['; color: var(--term-faint); }
+.panel__head h2::after  { content: ']'; color: var(--term-faint); }
+
+.count-badge {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 7px;
+  background: var(--bg-deep);
+  color: var(--term);
+  font-size: 11px;
+  border: 1px solid var(--term-faint);
+  text-align: center;
+}
+
+.badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.badge--weak        { background: rgba(255, 48, 48, 0.15);  color: #ff8080; border: 1px solid var(--danger); }
+.badge--medium      { background: rgba(255, 176, 0, 0.15);  color: var(--amber); border: 1px solid var(--amber); }
+.badge--strong      { background: rgba(0, 255, 65, 0.15);   color: var(--term); border: 1px solid var(--term); }
+.badge--very-strong { background: rgba(0, 255, 65, 0.25);   color: var(--term-bright); border: 1px solid var(--term-bright); }
+
+/* ===================== Генератор ===================== */
+
+.gen-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.gen-output-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+.gen-output-row input {
+  flex: 1;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 4px var(--term);
+}
+
+.gen-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+}
+
+#lengthRange {
+  width: 100%;
+  accent-color: var(--term);
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+}
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--term-dim);
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.08em;
+}
+.checkbox input {
+  accent-color: var(--term);
+  width: 14px;
+  height: 14px;
+}
+.checkbox:hover { color: var(--term-bright); }
+
+/* ===================== Список паролей ===================== */
+
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 240px;
+  max-width: 50vw;
+}
+.search-wrap svg {
+  position: absolute;
+  left: 10px;
+  color: var(--term-faint);
+  pointer-events: none;
+}
+.search-wrap input { padding-left: 32px; }
+
+.password-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.empty-state {
+  padding: 36px 12px;
+  text-align: center;
+  color: var(--term-faint);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+.empty-state::before {
+  content: '> ';
+  color: var(--term-faint);
+}
+
+.pwd-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  transition: border-color 0.1s, background 0.1s;
+}
+.pwd-item:hover {
+  border-color: var(--term);
+  background: var(--bg-elev-2);
+}
+
+.pwd-item__name {
+  font-size: 14px;
+  color: var(--term-bright);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 0 3px var(--term);
+}
+.pwd-item__icon {
+  width: 26px; height: 26px;
+  background: var(--bg-elev);
+  color: var(--term);
+  border: 1px solid var(--term-faint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.pwd-item__meta {
+  font-size: 10px;
+  color: var(--term-faint);
+  grid-column: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pwd-item__value {
+  font-size: 13px;
+  color: var(--term);
+  letter-spacing: 0.08em;
+  grid-column: 1;
+  text-shadow: 0 0 3px var(--term);
+}
+.pwd-item__value.masked { color: var(--term-faint); text-shadow: none; }
+
+.pwd-item__actions {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.icon-btn {
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--term-dim);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+}
+.icon-btn:hover {
+  color: var(--term-bright);
+  border-color: var(--term);
+  box-shadow: 0 0 6px rgba(0, 255, 65, 0.3);
+}
+.icon-btn.danger:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+  box-shadow: 0 0 6px var(--danger);
+}
+
+/* ===================== Модальные окна ===================== */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal[hidden] { display: none; }
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(1px);
+}
+.modal__dialog {
+  position: relative;
+  background: var(--bg-elev);
+  border: 1px solid var(--term);
+  box-shadow: 0 0 24px rgba(0, 255, 65, 0.3);
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  z-index: 1;
+}
+.modal__dialog::before {
+  content: 'VAULT-TEC TERMINAL';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  background: var(--term);
+  color: var(--bg-deep);
+  padding: 2px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+.modal__title {
+  margin: 18px 0 14px;
+  font-size: 16px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--term-bright);
+}
+.modal__title::before { content: '> '; color: var(--term-faint); }
+.modal__form { display: flex; flex-direction: column; gap: 12px; }
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* ===================== Тосты ===================== */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elev);
+  border: 1px solid var(--term);
+  color: var(--term-bright);
+  padding: 8px 16px;
+  font-size: 12px;
+  box-shadow: 0 0 16px rgba(0, 255, 65, 0.4);
+  z-index: 200;
+  max-width: 90vw;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.toast::before { content: '> '; color: var(--term-dim); }
+.toast[hidden] { display: none; }
+.toast.toast--success { border-color: var(--term); }
+.toast.toast--error   { border-color: var(--danger); color: #ff8080; box-shadow: 0 0 16px var(--danger); }
+
+/* ===================== Адаптивность ===================== */
+
+@media (max-width: 640px) {
+  .app-header { padding: 10px 14px; }
+  .app-main   { padding: 14px 12px 40px; }
+  .panel      { padding: 14px; }
+  .search-wrap { width: 100%; max-width: none; }
+  .panel__head { flex-direction: column; align-items: stretch; }
+  .gen-output-row { flex-wrap: wrap; }
+  .gen-output-row .primary-btn { width: 100%; }
+  .pwd-item { grid-template-columns: 1fr; }
+  .pwd-item__actions { grid-row: auto; grid-column: 1; justify-content: flex-end; }
+  .auth-logo h1 { font-size: 26px; }
+}

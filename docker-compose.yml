@@ -1,0 +1,65 @@
+# Docker Compose: два контейнера — backend (FastAPI) и caddy (реверс-прокси + статика).
+#
+# Связь:
+#   - caddy слушает 80/443, раздаёт фронтенд из ./frontend
+#     и проксирует /api/* на backend:8000.
+#   - backend доступен только внутри сети (не пробрасывается наружу).
+#
+# Деплой на сервере:
+#   1. Скопировать проект на сервер.
+#   2. cp .env.example .env и задать JWT_SECRET.
+#   3. Убедиться, что test.kozochka.org указывает на сервер (A-запись).
+#   4. docker compose up -d --build.
+#   5. Caddy автоматически получит сертификат Let's Encrypt.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pv-backend
+    restart: unless-stopped
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+      JWT_TTL_MINUTES: ${JWT_TTL_MINUTES:-120}
+      DB_PATH: /data/passwords.db
+    volumes:
+      - backend-data:/data
+    networks:
+      - pv-net
+    # Порт наружу НЕ пробрасываем — ходим только через Caddy.
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: pv-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./frontend:/srv:ro              # статика фронтенда
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data                # состояние Caddy + сертификаты
+      - caddy-config:/config
+    networks:
+      - pv-net
+    depends_on:
+      - backend
+
+volumes:
+  backend-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  pv-net:
+    driver: bridge
