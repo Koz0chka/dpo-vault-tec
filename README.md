@@ -7,7 +7,7 @@ RobCo Industries, CRT-скан-линии, терминальные орнаме
 Бэкенд: Python (FastAPI), SQLite, всё хэшируется / выводится ключ через **argon2id**.
 Фронтенд: чистые HTML/CSS/JS без фреймворков.
 Развёртывание: два Docker-контейнера (backend + Caddy), Caddy светится
-на домене `test.kozochka.org` и автоматически получает TLS-сертификат
+на домене `hermenius.kozochka.org` и автоматически получает TLS-сертификат
 от Let's Encrypt.
 
 ---
@@ -59,7 +59,7 @@ RobCo Industries, CRT-скан-линии, терминальные орнаме
 │       ├── register.js     # логика регистрации + оценка силы
 │       └── dashboard.js    # логика хранилища
 ├── caddy/
-│   ├── Caddyfile           # прод: test.kozochka.org + TLS + headers
+│   ├── Caddyfile           # прод: hermenius.kozochka.org + TLS + headers
 │   └── dev.Caddyfile       # локально: http://localhost:8080 без TLS
 ├── docker-compose.yml      # 2 контейнера: backend + caddy
 ├── .env.example            # шаблон переменных окружения
@@ -157,7 +157,7 @@ uvicorn backend.app.main:app --reload --port 8000
 
 ---
 
-## Развёртывание на сервере (test.kozochka.org)
+## Развёртывание на сервере (hermenius.kozochka.org)
 
 ### 1. Подготовка сервера
 
@@ -171,10 +171,10 @@ uvicorn backend.app.main:app --reload --port 8000
 Добавьте A-запись:
 
 ```
-test.kozochka.org.   IN  A   <IP-вашего-сервера>
+hermenius.kozochka.org.   IN  A   <IP-вашего-сервера>
 ```
 
-Дождитесь расклейки (`dig test.kozochka.org`).
+Дождитесь расклейки (`dig hermenius.kozochka.org`).
 
 ### 3. Клонирование и настройка
 
@@ -206,11 +206,11 @@ Caddy при первом старте запросит сертификат у 
 Проверка:
 ```bash
 docker compose ps
-curl -s https://test.kozochka.org/api/health
+curl -s https://hermenius.kozochka.org/api/health
 # -> {"status":"ok"}
 ```
 
-Откройте в браузере: **https://test.kozochka.org**
+Откройте в браузере: **https://hermenius.kozochka.org**
 
 ### 5. Логи
 
